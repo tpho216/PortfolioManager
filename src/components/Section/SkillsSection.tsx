@@ -1,40 +1,28 @@
 import React, { useEffect, useState } from "react";
 import { FlatList, ListRenderItem, Modal, StyleSheet, Text, TextInput, TouchableOpacity, View } from "react-native";
 import {useDispatch} from "react-redux";
-import { SectionItem } from "./SectionItem";
 import { useSelector } from "react-redux";
 import { RootState } from "../../redux/reducers/rootReducer";
 import APIClient from "../../api/APIClient";
-import { IProject } from "../../api/interfaces/IProject";
+import { ISkill } from "../../api/interfaces/ISkill";
 
-
-export interface Props {
-  sectionItems: SectionItem[];
-}
-
-const mockData : SectionItem[] = [
-  new SectionItem("Programming"),
-];
-
-export const ProjectsSection: React.FC <{
+export const SkillsSection: React.FC <{
   title: string;
 }> = ({children, title}) => {
   const dispatch = useDispatch();
   const apiClient : APIClient = new APIClient();
   const [isModalVisible, setIsModalVisible] = useState(false);
-  const [nameInputText, setNameInputText] = useState("String");
-  const [editItem, setEditItem] = useState<IProject | undefined>(undefined);
-  const [data, setData] = useState(mockData);
+  const [nameInputText, setNameInputText] = useState("");
+  const [descriptionInputText, setDescriptionInputText] = useState("");
+  const [editItem, setEditItem] = useState<ISkill | undefined>(undefined);
   const [isRendering, setIsRendering] = useState(false);
-  const projectsData : any = useSelector((state: RootState) => state.projects);
-  //const [projectsData, setProjectsData] = useState({});
+  const skillsData : any = useSelector((state: RootState) => state.skills);
 
   useEffect(() => {
     (async () => {
       try {
-        const projectsResponse = await apiClient.portfolioDataService.getProjects();
-        dispatch({ type: "FETCH_PROJECTS_DATA", payload: projectsResponse.data });
-         console.log(projectsResponse.data);
+        const skillsResponse = await apiClient.portfolioDataService.getSkills();
+        dispatch({ type: "FETCH_SKILLS_DATA", payload: skillsResponse.data });
       } catch (e) {
         console.log("error:", e);
       }
@@ -42,10 +30,8 @@ export const ProjectsSection: React.FC <{
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
- useEffect(() => {
-   //console.log("projectsData", projectsData);
- }, [projectsData])
-  const renderItem : ListRenderItem<IProject> = ({item} : {item: IProject}) => {
+
+  const renderItem : ListRenderItem<ISkill> = ({item} : {item: ISkill}) => {
     return (
       <TouchableOpacity
         style={styles.sectionListItem}
@@ -58,31 +44,35 @@ export const ProjectsSection: React.FC <{
   };
 
   const onPressItem = (
-    item : IProject | undefined) => {
+    item : ISkill | undefined) => {
     if (item) {
       setIsModalVisible(true);
       setNameInputText(item.name);
+      setDescriptionInputText(item.description)
       setEditItem(item)
     }
   };
 
 
-  const setInputText = (text : string) => {
-    setNameInputText(text);
-  };
-  const handleEditItem = (editItem : IProject | undefined) => {
-    console.log("editItem :", editItem);
-    const newData = projectsData.projects.map((project: IProject) => {
-      if (project === editItem) {
-        project.name = nameInputText;
-        return project;
+
+  const handleEditItem = (editItem : ISkill | undefined) => {
+    skillsData.skills.map((skill: ISkill) => {
+      if (skill === editItem) {
+        skill.name = nameInputText;
+        skill.description = descriptionInputText;
+        updateSkill(skill);
+        return skill;
       }
-      return project;
+      return skill;
     });
-    setData(newData);
-    console.log("newData:", newData);
+
     setIsRendering(!isRendering);
   };
+
+  const updateSkill = (skill : ISkill) => {
+    const result = apiClient.portfolioDataService.updateSkill(skill);
+    console.log(result);
+  }
 
 
   const onPressSaveEdit = () => {
@@ -102,7 +92,7 @@ export const ProjectsSection: React.FC <{
         {children}
       </Text>
       <FlatList
-        data={projectsData.projects}
+        data={skillsData.skills}
         keyExtractor={(item) => item.name.toString()}
         renderItem={renderItem}
         extraData={isRendering}
@@ -121,13 +111,26 @@ export const ProjectsSection: React.FC <{
           </Text>
           <TextInput
             style={styles.modalInput}
-            onChangeText={(text) => setInputText(text)}
+            onChangeText={(text) => setNameInputText(text)}
             defaultValue={nameInputText}
             editable={true}
             multiline={false}
             maxLength={20}
           >
           </TextInput>
+          <Text style={styles.modalTxt}>
+            Description
+          </Text>
+          <TextInput
+              style={styles.modalInput}
+              onChangeText={(text) => setDescriptionInputText(text)}
+              defaultValue={descriptionInputText}
+              editable={true}
+              multiline={false}
+              maxLength={20}
+          >
+          </TextInput>
+
           <TouchableOpacity
             onPress={() => {onPressSaveEdit()}}
             style={styles.touchableSave}>
