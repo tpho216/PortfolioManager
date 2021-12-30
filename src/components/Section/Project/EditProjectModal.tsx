@@ -1,49 +1,59 @@
-import React, {useState} from "react";
+import React, {useEffect, useState} from "react";
 import APIClient from "../../../api/APIClient";
-import {useDispatch} from "react-redux";
-import {IProject} from "../../../api/interfaces/IProject";
-import {addProjectItem, updateProjectItem} from "../../../redux/actions/projectsAction";
-import {Modal, TextInput, TouchableOpacity, View, Text} from "react-native";
+import {useDispatch, useSelector} from "react-redux";
+import {editProjectItem, fetchProjects, updateProjectItem} from "../../../redux/actions/projectsAction";
+import {Modal, TextInput, TouchableOpacity, View, Text, ActivityIndicator} from "react-native";
 import {modalStyles} from "../../../common/styles";
+import {RootState} from "../../../redux/reducers/rootReducer";
+import {editProjectModalReducer} from "../../../redux/reducers/projectsReducer";
 
 
 interface EditProjectModalProps {
-    nameInputText : string,
-    descriptionInputText : string,
     visible : boolean,
-    editItem : IProject,
-    data : IProject[]
     callback : any
 }
 
 export const EditProjectModal: React.FC <EditProjectModalProps> = (props) => {
-    const [nameInputText, setNameInputText] = useState(props.nameInputText);
-    const [descriptionInputText, setDescriptionInputText] = useState(props.descriptionInputText);
-
-    const [isRendering, setIsRendering] = useState(false);
+    const projectsData : any  = useSelector((state: RootState) => state.projects);
+    const editProjectModalData : any = useSelector((state: RootState) => state.editProjectModal);
+    const [loading, setLoading] = useState(false);
     const apiClient : APIClient = new APIClient();
     const dispatch = useDispatch();
 
+    useEffect(() => {
+      console.log("UDEFEEFFCT: ", editProjectModalData.editProjectModal);
+    }, [])
 
-    const handleEditItem = async (editItem : IProject) => {
+
+    const handleInputChanged = (newName : string, newDescription : string) => {
+        const newProject = {
+            id: editProjectModalData.editProjectModal.id,
+            name : newName,
+            description : newDescription
+        }
+        dispatch(editProjectItem(newProject));
+    }
+
+    const onPressSaveEdit = async () => {
+        setLoading(true);
+        const editItem  = editProjectModalData.editProjectModal;
         const newProject = {
             id: editItem.id,
-            name : nameInputText,
-            description: descriptionInputText
+            name : editItem.name,
+            description: editItem.description
         }
 
         // ! Make API call here (not in dispatch function)
         // may cause interruption otherwise
+        console.log("NEW PROJECT:", newProject);
         await apiClient.portfolioDataService.updateProject(newProject);
-        dispatch(updateProjectItem(props.data, newProject));
+        dispatch(updateProjectItem(projectsData.projects, newProject));
 
-        setIsRendering(!isRendering);
-    };
-
-
-    const onPressSaveEdit = () => {
-        handleEditItem(props.editItem);
+        const projectsResponse = await apiClient.portfolioDataService.fetchProjects();
+        dispatch(fetchProjects(projectsResponse.data));
+        setLoading(false);
         props.callback(null);
+
     };
 
     return (
@@ -60,8 +70,10 @@ export const EditProjectModal: React.FC <EditProjectModalProps> = (props) => {
                 </Text>
                 <TextInput
                     style={modalStyles.input}
-                    onChangeText={(text) => setNameInputText(text)}
-                    defaultValue={nameInputText}
+                    onChangeText={(nameTxt) =>
+                        handleInputChanged(nameTxt, editProjectModalData.editProjectModal.description)
+                    }
+                    defaultValue={editProjectModalData.editProjectModal.name}
                     editable={true}
                     multiline={false}
                     maxLength={20}
@@ -72,8 +84,9 @@ export const EditProjectModal: React.FC <EditProjectModalProps> = (props) => {
                 </Text>
                 <TextInput
                     style={modalStyles.input}
-                    onChangeText={(text) => setDescriptionInputText(text)}
-                    defaultValue={descriptionInputText}
+                    onChangeText={(descTxt) =>
+                        handleInputChanged(editProjectModalData.editProjectModal. name, descTxt)}
+                    defaultValue={editProjectModalData.editProjectModal.description}
                     editable={true}
                     multiline={false}
                     maxLength={20}
@@ -81,11 +94,19 @@ export const EditProjectModal: React.FC <EditProjectModalProps> = (props) => {
                 </TextInput>
 
                 <TouchableOpacity
-                    onPress={() => {onPressSaveEdit()}}
+                    onPress={async () => {await onPressSaveEdit()}}
                     style={modalStyles.touchableSave}>
-                    <Text style={modalStyles.lbl}>
-                        Save
-                    </Text>
+                    <View>
+                        {loading
+                            ?
+                            <ActivityIndicator style={modalStyles.lbl} size="large" color="black"/>
+                            :
+                            <Text style={modalStyles.lbl}>
+                            Save
+                        </Text>}
+
+                    </View>
+
                 </TouchableOpacity>
 
             </View>
