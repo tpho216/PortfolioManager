@@ -24,10 +24,10 @@ export const PortfolioActionButtonsGroup: React.FC <{}> = ({
         <>
             <ActionButton buttonColor="rgba(231,76,60,1)">
                 <ActionButton.Item buttonColor='#9b59b6' title="New Project" onPress={() => handleCreateProjectButtonPressed( true)}>
-                    <Icon name="action-create-project" style={styles.actionButtonIcon} />
+                    <Icon name="add" style={styles.actionButtonIcon} />
                 </ActionButton.Item>
                 <ActionButton.Item buttonColor='#1abc9c' title="New Skill" onPress={() => handleCreateSkillAction()}>
-                    <Icon name="action-create-skill" style={styles.actionButtonIcon} />
+                    <Icon name="add" style={styles.actionButtonIcon} />
                 </ActionButton.Item>
             </ActionButton>
             <CreateNewProjectModal visible={shouldDisplayCreateProjectModal} callback={handleCreateProjectButtonPressed}/>
