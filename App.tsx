@@ -43,9 +43,11 @@ const App = () => {
         <Header/>
         <ProjectsSection title="My Projects"/>
         <SkillsSection title="My Skills"/>
+
       </ScrollView>
         <PortfolioActionButtonsGroup/>
     </SafeAreaView>
+
   );
 };
 
