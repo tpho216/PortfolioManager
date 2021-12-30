@@ -17,6 +17,15 @@ class PortfolioDataService {
     }
   }
 
+  public async getProject(id: string) {
+    try {
+      return this.axios.get<IProject>(`/project/${id}`);
+    } catch (e) {
+      console.log(e);
+      throw e;
+    }
+  }
+
   public async fetchProjects() {
     try {
       return this.axios.get<IProject[]>('/project');
