@@ -1,13 +1,16 @@
 import { combineReducers} from "redux";
-import projectsReducer, { projectsState} from "./projectsReducer";
 import skillsReducer, {skillsState} from "./skillsReducer";
+import {editProjectModalReducer, editProjectModalState, projectsReducer, projectsState} from "./projectsReducer";
 
 export interface RootState {
   projects: projectsState,
-  skills: skillsState
+  editProjectModal : editProjectModalState,
+  skills: skillsState,
+
 }
 export const rootReducer = combineReducers<RootState>({
   projects : projectsReducer,
+  editProjectModal : editProjectModalReducer,
   skills : skillsReducer,
 });
 

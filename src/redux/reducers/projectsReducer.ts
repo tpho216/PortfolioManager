@@ -1,12 +1,13 @@
 import {
-  CREATE_PROJECT_ITEM_ACTION, DELETE_PROJECT_ITEM_ACTION, FETCH_PROJECTS_DATA_ACTION,
+  CREATE_PROJECT_ITEM_ACTION, DELETE_PROJECT_ITEM_ACTION, EDIT_PROJECT_ITEM_ACTION, FETCH_PROJECTS_DATA_ACTION,
   INIT_PROJECTS_DATA_ACTION,
   Payload,
   UPDATE_PROJECT_ITEM_ACTION
 } from "../../common/types";
+import {IProject} from "../../api/interfaces/IProject";
 
 export interface projectsState {
-  projects : []
+  projects : IProject[],
 }
 
 const initialProjectsState = {
@@ -15,24 +16,24 @@ const initialProjectsState = {
       name: 'Loading...',
       description: "Loading",
     },
-  ]
+  ],
 }
 
 
 /**
- * Skills Reducer
+ * Projects Reducer
  * Handle state for getting projects information
  */
 
-export default function projectsReducer (
-  state = initialProjectsState,
+function projectsReducer (
+  state   = initialProjectsState,
   action : Payload)
 {
   switch (action.type) {
     case INIT_PROJECTS_DATA_ACTION:
       return {
         ...state,
-        projects : initialProjectsState
+        projects : initialProjectsState,
       };
     case CREATE_PROJECT_ITEM_ACTION:
       return {
@@ -65,6 +66,47 @@ export default function projectsReducer (
       }
     default:
       return state;
+  }
+}
+
+
+export interface editProjectModalState {
+  editProjectModal : IProject
+}
+
+
+const initialEditProjectModalState = {
+  editProjectModal : {
+    id: "Loading...",
+    name: "Loading...",
+    description: "Loading...",
+  }
+}
+
+function editProjectModalReducer (
+    state = initialEditProjectModalState,
+    action : Payload
+) {
+  switch (action.type) {
+    case "INIT_EDIT_PROJECT_MODAL":
+      return {
+        ...state,
+          editProjectModal : initialEditProjectModalState
+      };
+    case EDIT_PROJECT_ITEM_ACTION:
+      console.log("itemmm:", action.payload.item);
+      console.log("staettte...:", state);
+      return {
+        ...state,
+        editProjectModal: action.payload.item
+      };
+    default:
+      return state;
 
   }
+}
+
+export {
+  projectsReducer,
+  editProjectModalReducer
 }
