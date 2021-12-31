@@ -1,36 +1,39 @@
-import React, {useEffect, useState} from "react";
+import React, {useState} from "react";
 import ActionButton from "react-native-action-button";
 // @ts-ignore
 import Icon from "react-native-vector-icons/Ionicons";
-import {FlatList, Modal, StyleSheet, Text, TextInput, TouchableOpacity, View} from "react-native";
+import {StyleSheet} from "react-native";
 import {CreateNewProjectModal} from "./CreateNewProjectModal";
+import {CreateNewSkillModal} from "./CreateNewSkillModal";
 
 export const PortfolioActionButtonsGroup: React.FC <{}> = ({
     children
 }) => {
     const [shouldDisplayCreateProjectModal, setShouldDisplayCreateProjectModal] = useState(false);
+    const [shouldDisplayCreateSkillModal, setShouldDisplayCreateSkillModal] = useState(false);
 
 
-
-    const handleCreateProjectButtonPressed = async (shouldDisplayModal : boolean) => {
-        console.log("Create Project Action ...");
+    const handleCreateProjectAction = async (shouldDisplayModal : boolean) => {
+        console.log("Create Projects Action ...");
         setShouldDisplayCreateProjectModal(shouldDisplayModal);
     }
 
-    const handleCreateSkillAction = async () => {
-        console.log("Create Skill Action ...");
+    const handleCreateSkillAction = async (shouldDisplayModal : boolean) => {
+        console.log("Create Skills Action ...");
+        setShouldDisplayCreateSkillModal(shouldDisplayModal)
     }
     return (
         <>
             <ActionButton buttonColor="rgba(231,76,60,1)">
-                <ActionButton.Item buttonColor='#9b59b6' title="New Project" onPress={() => handleCreateProjectButtonPressed( true)}>
+                <ActionButton.Item buttonColor='#9b59b6' title="New Project" onPress={() => handleCreateProjectAction( true)}>
                     <Icon name="add" style={styles.actionButtonIcon} />
                 </ActionButton.Item>
-                <ActionButton.Item buttonColor='#1abc9c' title="New Skill" onPress={() => handleCreateSkillAction()}>
+                <ActionButton.Item buttonColor='#1abc9c' title="New Skill" onPress={() => handleCreateSkillAction(true)}>
                     <Icon name="add" style={styles.actionButtonIcon} />
                 </ActionButton.Item>
             </ActionButton>
-            <CreateNewProjectModal visible={shouldDisplayCreateProjectModal} callback={handleCreateProjectButtonPressed}/>
+            <CreateNewProjectModal visible={shouldDisplayCreateProjectModal} callback={handleCreateProjectAction}/>
+            <CreateNewSkillModal visible={shouldDisplayCreateSkillModal} callback={handleCreateSkillAction}/>
         </>
 
 
