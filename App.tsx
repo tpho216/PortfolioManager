@@ -2,12 +2,13 @@ import React from "react";
 import {RefreshControl, SafeAreaView, ScrollView, StatusBar, StyleSheet, useColorScheme, View} from "react-native";
 import { Colors } from "react-native/Libraries/NewAppScreen";
 import { Header } from "./src/components/Header/Header";
-import { ProjectsSection } from "./src/components/Section/Project/ProjectsSection";
-import {SkillsSection} from "./src/components/Section/SkillsSection";
+import { ProjectsSection } from "./src/components/Section/Projects/ProjectsSection";
+import {SkillsSection} from "./src/components/Section/Skills/SkillsSection";
 import {PortfolioActionButtonsGroup} from "./src/components/PortfolioAction/PortfolioActionButtonsGroup";
 import {useDispatch} from "react-redux";
 import {fetchProjects} from "./src/redux/actions/projectsAction";
 import APIClient from "./src/api/APIClient";
+import {fetchSkills} from "./src/redux/actions/skillsAction";
 
 const App = () => {
   const [refreshing, setRefreshing] = React.useState(false);
@@ -22,6 +23,8 @@ const App = () => {
   const onRefresh = React.useCallback(async () => {
     setRefreshing(true);
     const projectsResponse = await apiClient.portfolioDataService.fetchProjects();
+    const skillsResponse = await apiClient.portfolioDataService.fetchSkills();
+    dispatch(fetchSkills(skillsResponse.data));
     dispatch(fetchProjects(projectsResponse.data));
     setRefreshing(false);
 
@@ -30,7 +33,6 @@ const App = () => {
 
 
   return (
-
     <SafeAreaView style={backgroundStyle}>
       <StatusBar barStyle={isDarkMode ? 'light-content' : 'dark-content'} />
       <ScrollView
