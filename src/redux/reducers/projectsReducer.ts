@@ -94,11 +94,10 @@ function editProjectModalReducer (
           editProjectModal : initialEditProjectModalState
       };
     case EDIT_PROJECT_ITEM_ACTION:
-      console.log("itemmm:", action.payload.item);
-      console.log("staettte...:", state);
+      console.log("action.payload.project", action.payload.project);
       return {
         ...state,
-        editProjectModal: action.payload.item
+        editProjectModal: action.payload.project
       };
     default:
       return state;
