@@ -8,6 +8,7 @@ class PortfolioDataService {
   constructor(axiosInstance: AxiosInstance) {
     this.axios = axiosInstance;
   }
+
   public async createProject(project : IProject) {
     try {
       return this.axios.post<IProject>('/project', project);
@@ -53,14 +54,40 @@ class PortfolioDataService {
     }
   }
 
-
-
-  public async getSkills() {
-    return this.axios.get<ISkill[]>('/skill');
+  public async createSkill(skill : ISkill) {
+    try {
+      return this.axios.post<ISkill>('/skill', skill);
+    } catch (e) {
+      console.log(e);
+      throw e;
+    }
   }
 
-  public async updateSkill(skill: ISkill) {
-    return this.axios.put(`/skill/${skill.id}`, skill);
+  public async fetchSkills() {
+    try {
+      return this.axios.get<ISkill[]>('/skill');
+    } catch (e) {
+      console.log(e);
+      throw e;
+    }
+  }
+
+  public async updateSkill(skill : ISkill) {
+    try {
+      return this.axios.put<ISkill>(`skill/${skill.id}`, skill);
+    } catch (e) {
+      console.log(e);
+      throw e;
+    }
+  }
+
+  public async deleteSkill(skill : ISkill) {
+    try {
+      return this.axios.delete(`/skill/${skill.id}`);
+    } catch (e) {
+      console.log(e);
+      throw e;
+    }
   }
 
 }
