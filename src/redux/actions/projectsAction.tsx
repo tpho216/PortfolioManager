@@ -1,4 +1,3 @@
-import APIClient from "../../api/APIClient";
 import {IProject} from "../../api/interfaces/IProject";
 import {
     CREATE_PROJECT_ITEM_ACTION,
@@ -17,13 +16,10 @@ export const fetchProjects = (projects : IProject[]) => async (dispatch : any) =
     }
 }
 
-export const updateProjectItem = (projectsArray : IProject[], project: IProject,
-                                         ) => async (dispatch : any) => {
+export const updateProjectItem = (projects : IProject[], project: IProject) => async (dispatch : any) => {
     try {
-        console.log("DISPATCH", project);
-
-        projectsArray.map((project : IProject, index: number) => {
-            if (project.id === project.id) {
+        projects.map((item : IProject, index: number) => {
+            if (item.id === project.id) {
                 dispatch({ type: UPDATE_PROJECT_ITEM_ACTION, payload: {project: project, index: index}});
             }
         })
@@ -33,10 +29,10 @@ export const updateProjectItem = (projectsArray : IProject[], project: IProject,
     }
 }
 
-export const deleteProjectItem = (projectsArray : IProject[], project : IProject) => async (dispatch: any) => {
+export const deleteProjectItem = (projects : IProject[], project : IProject) => async (dispatch: any) => {
     try {
-        projectsArray.map((project : IProject, index : number) => {
-            if (project.id === project.id) {
+        projects.map((item : IProject, index : number) => {
+            if (item.id === project.id) {
                 dispatch({ type: DELETE_PROJECT_ITEM_ACTION, payload: {index: index}})
             }
         });
@@ -57,7 +53,7 @@ export const addProjectItem = (project : IProject) => async (dispatch : any) => 
 
 export const editProjectItem = (project : IProject) => async (dispatch : any) => {
     try {
-        dispatch({type: EDIT_PROJECT_ITEM_ACTION, payload: {item: project}});
+        dispatch({type: EDIT_PROJECT_ITEM_ACTION, payload: {project: project}});
     } catch (e) {
         console.log("error: ", e);
         throw e;
