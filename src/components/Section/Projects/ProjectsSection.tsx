@@ -7,19 +7,18 @@ import {IProject } from "../../../api/interfaces/IProject";
 import {Swipeable} from "react-native-gesture-handler";
 import {
   deleteProjectItem,
-  updateProjectItem,
   fetchProjects,
   editProjectItem
 } from "../../../redux/actions/projectsAction";
 import {EditProjectModal} from "./EditProjectModal";
 import {sectionStyles} from "../../../common/styles";
+import {height, swipeLeft} from "../../../common/animation";
 
 export const ProjectsSection: React.FC <{
   title: string;
 }> = ({children, title}) => {
   const dispatch = useDispatch();
   const apiClient : APIClient = new APIClient();
-  const [isRendering, setIsRendering] = useState(false);
   const projectsData : any = useSelector((state: RootState) => state.projects);
   const [shouldDisplayEditProjectModal, setShouldDisplayEditProjectModal] = useState(false);
 
@@ -30,52 +29,39 @@ export const ProjectsSection: React.FC <{
     })();
   }, []);
 
-  const swipeRight = (progress: any,dragX : any) =>{
-    const scale = dragX.interpolate({
-      inputRange:[-200,0],
-      outputRange:[1,0.5],
-      extrapolate:'clamp'
-    })
-    return(
-        <Animated.View style={{backgroundColor:'red',width:"100%",justifyContent:'center'}}>
-          <Animated.Text style={{marginLeft:'auto',marginRight:50, fontSize:15, fontWeight:'bold',transform:[{scale}]}}>Delete</Animated.Text>
-        </Animated.View>
-    )
-  }
 
-  const height = new Animated.Value(70)
+    const renderItem : ListRenderItem<IProject> = ({item} : {item: IProject}) => {
 
-  const handleDeleteAnimation = async (projectItem : IProject) => {
+        return (
+            <Swipeable renderRightActions={swipeLeft} rightThreshold={-200}
+                       onSwipeableOpen={async () => handleDeleteAnimation(item)}
+            >
+                <Animated.View style={{flex:1}}>
+                    <TouchableOpacity
+                        style={sectionStyles.listItem}
+                        onPress={() => onPressItem(item)}>
+                        <Text style={sectionStyles.listItemName}>
+                            {item.name}
+                        </Text>
+                    </TouchableOpacity>
+                </Animated.View>
+            </Swipeable>
+        );
+    };
+
+  const handleDeleteAnimation = async (item : IProject) => {
     Animated.timing(height, {
       toValue: 0,
       duration: 350,
       useNativeDriver:false
     }).start(async () => {
 
-      dispatch(deleteProjectItem(projectsData.projects, projectItem));
-      await apiClient.portfolioDataService.deleteProject(projectItem);
+      dispatch(deleteProjectItem(projectsData.projects, item));
+      await apiClient.portfolioDataService.deleteProject(item);
     });
 
   }
 
-  const renderItem : ListRenderItem<IProject> = ({item} : {item: IProject}) => {
-
-    return (
-        <Swipeable renderRightActions={swipeRight} rightThreshold={-200}
-          onSwipeableOpen={async () => handleDeleteAnimation(item)}
-        >
-            <Animated.View style={{flex:1}}>
-              <TouchableOpacity
-                   style={sectionStyles.listItem}
-                  onPress={() => onPressItem(item)}>
-                <Text style={sectionStyles.listItemName}>
-                  {item.name}
-                </Text>
-              </TouchableOpacity>
-            </Animated.View>
-        </Swipeable>
-    );
-  };
 
   const onPressItem = (
     item : IProject) => {
@@ -102,7 +88,6 @@ export const ProjectsSection: React.FC <{
         data={projectsData.projects}
         keyExtractor={(item) => item.id}
         renderItem={renderItem}
-        extraData={isRendering}
       >
       </FlatList>
 

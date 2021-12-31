@@ -1,63 +1,60 @@
-import React, {useEffect, useState} from "react";
-import APIClient from "../../../api/APIClient";
-import {useDispatch, useSelector} from "react-redux";
-import {editProjectItem, fetchProjects, updateProjectItem} from "../../../redux/actions/projectsAction";
-import {Modal, TextInput, TouchableOpacity, View, Text, ActivityIndicator} from "react-native";
+import React, {useState} from "react";
+import {ActivityIndicator, Modal, Text, TextInput, TouchableOpacity, View} from "react-native";
 import {modalStyles} from "../../../common/styles";
+import {editProjectItem} from "../../../redux/actions/projectsAction";
+import {useDispatch, useSelector} from "react-redux";
 import {RootState} from "../../../redux/reducers/rootReducer";
-import {editProjectModalReducer} from "../../../redux/reducers/projectsReducer";
+import APIClient from "../../../api/APIClient";
+import {editSkillItem, fetchSkills, updateSkillItem} from "../../../redux/actions/skillsAction";
 
-
-interface EditProjectModalProps {
+interface EditSkillModalProps {
     visible : boolean,
     callback : any
 }
 
-export const EditProjectModal: React.FC <EditProjectModalProps> = (props) => {
-    const projectsData : any  = useSelector((state: RootState) => state.projects);
-    const editProjectModalData : any = useSelector((state: RootState) => state.editProjectModal);
+export const EditSkillModal: React.FC <EditSkillModalProps> = (props) => {
+    const skillsData : any  = useSelector((state: RootState) => state.skills);
+    const editSkillModalData : any = useSelector((state: RootState) => state.editSkillModal);
     const [loading, setLoading] = useState(false);
     const apiClient : APIClient = new APIClient();
     const dispatch = useDispatch();
 
-    useEffect(() => {
-      console.log("UDEFEEFFCT: ", editProjectModalData.editProjectModal);
-    }, [])
-
-
     const handleInputChanged = (newName : string, newDescription : string) => {
-        const newProject = {
-            id: editProjectModalData.editProjectModal.id,
+        console.log("newName: ", newName);
+        console.log("editSkillModalData", editSkillModalData);
+        const newSkill = {
+            id: editSkillModalData.editSkillModal.id,
             name : newName,
-            description : newDescription
+            description : newDescription,
+            languages : editSkillModalData.editSkillModal.languages,
         }
-        dispatch(editProjectItem(newProject));
+        dispatch(editSkillItem(newSkill));
     }
+
 
     const onPressSaveEdit = async () => {
         setLoading(true);
-        const editItem  = editProjectModalData.editProjectModal;
-        const newProject = {
-            id: editItem.id,
-            name : editItem.name,
-            description: editItem.description
+        const newSkill = {
+            id: editSkillModalData.editSkillModal.id,
+            name : editSkillModalData.editSkillModal.name,
+            description: editSkillModalData.editSkillModal.description,
+            languages : editSkillModalData.editSkillModal.languages
         }
 
         // ! Make API call here (not in dispatch function)
         // may cause interruption otherwise
-        console.log("NEW PROJECT:", newProject);
-        await apiClient.portfolioDataService.updateProject(newProject);
-        dispatch(updateProjectItem(projectsData.projects, newProject));
+        console.log("NEW SKILL:", newSkill);
+        await apiClient.portfolioDataService.updateSkill(newSkill);
+        dispatch(updateSkillItem(skillsData.skills, newSkill));
 
-        const projectsResponse = await apiClient.portfolioDataService.fetchProjects();
-        dispatch(fetchProjects(projectsResponse.data));
+        const projectsResponse = await apiClient.portfolioDataService.fetchSkills();
+        dispatch(fetchSkills(projectsResponse.data));
         setLoading(false);
         props.callback(null);
 
     };
 
     return (
-
         <Modal
             animationType="fade"
             visible={props.visible}
@@ -71,9 +68,9 @@ export const EditProjectModal: React.FC <EditProjectModalProps> = (props) => {
                 <TextInput
                     style={modalStyles.input}
                     onChangeText={(nameTxt) =>
-                        handleInputChanged(nameTxt, editProjectModalData.editProjectModal.description)
+                        handleInputChanged(nameTxt, editSkillModalData.editSkillModal.description)
                     }
-                    defaultValue={editProjectModalData.editProjectModal.name}
+                    defaultValue={editSkillModalData.editSkillModal.name}
                     editable={true}
                     multiline={false}
                     maxLength={20}
@@ -85,8 +82,8 @@ export const EditProjectModal: React.FC <EditProjectModalProps> = (props) => {
                 <TextInput
                     style={modalStyles.input}
                     onChangeText={(descTxt) =>
-                        handleInputChanged(editProjectModalData.editProjectModal. name, descTxt)}
-                    defaultValue={editProjectModalData.editProjectModal.description}
+                        handleInputChanged(editSkillModalData.editSkillModal.name, descTxt)}
+                    defaultValue={editSkillModalData.editSkillModal.description}
                     editable={true}
                     multiline={false}
                     maxLength={20}
@@ -102,8 +99,8 @@ export const EditProjectModal: React.FC <EditProjectModalProps> = (props) => {
                             <ActivityIndicator style={modalStyles.lbl} size="large" color="black"/>
                             :
                             <Text style={modalStyles.lbl}>
-                            Save
-                        </Text>}
+                                Save
+                            </Text>}
 
                     </View>
 
@@ -114,4 +111,3 @@ export const EditProjectModal: React.FC <EditProjectModalProps> = (props) => {
         </Modal>
     )
 }
-
